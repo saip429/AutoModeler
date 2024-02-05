@@ -1,7 +1,7 @@
 todo.txt
-___pycache__/
+__pycache__/
 .pytest_cache/
-*/___pycache__/
+*/__pycache__/
 *.csv 
 *.xls
 *.pdf
