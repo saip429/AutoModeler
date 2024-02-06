@@ -18,6 +18,16 @@ class DataPreprocessor:
     def __init__(self, dataframe:pd.DataFrame)->None:
         self.dataframe:pd.DataFrame=dataframe
         self.returnLogs:str=None
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self,exc_type,exc_value,exc_tb):
+        if exc_type is None:
+            self.save()
+
+    def save(self)->None:
+        self.dataframe.to_csv('sample_csv copy.csv',index=False)        
         
 
     def handle_na(self, method:str):

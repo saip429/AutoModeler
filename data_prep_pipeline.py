@@ -23,7 +23,7 @@ import seaborn as sns
 import random
 from scipy.stats import zscore
 from utils.purge import PurgeDirectory
-from data_preprocessing_pipeline import DataPreprocessor
+import os
 import io
 
 
@@ -105,7 +105,9 @@ class DataPrep:
         sns.pairplot(self.df)
         image_id= random.randint(100,999)
         plt.savefig(f'images/{self.file_name}_{image_id}.png')
-        self.inspectResults['pairplot']=f'images/{self.file_name}_{image_id}.png'
+        path=f'images/{self.file_name}_{image_id}.png'
+        abs_path= os.path.abspath(path)
+        self.inspectResults['pairplot']=f'{abs_path}'
 
         
 

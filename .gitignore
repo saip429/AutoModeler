@@ -1,7 +1,9 @@
-todo.txt
+
 __pycache__/
 .pytest_cache/
 */__pycache__/
 *.csv 
 *.xls
 *.pdf
+*.png
+
