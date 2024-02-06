@@ -1,6 +1,7 @@
 '''
 Data preprocessing pipeline:
-involves functions to handle missing values, outliers
+involves functions to handle missing values, outliers, standardize data, label encoding
+implemented as a context manager
 required args: pandas dataframe
 
 '''
