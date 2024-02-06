@@ -2,7 +2,8 @@
 Data preprocessing pipeline:
 involves functions to handle missing values, outliers, standardize data, label encoding
 implemented as a context manager
-required args: pandas dataframe
+required args: pandas dataframe, file path
+returns: data pre processing results upon invoking the get_result method
 
 '''
 
@@ -16,7 +17,8 @@ import constants as c
 
 
 class DataPreprocessor:
-    def __init__(self, dataframe:pd.DataFrame)->None:
+    def __init__(self, dataframe:pd.DataFrame, file_name:str)->None:
+        self.file_name=file_name
         self.dataframe:pd.DataFrame=dataframe
         self.returnLogs:str=None
 
@@ -28,7 +30,7 @@ class DataPreprocessor:
             self.save()
 
     def save(self)->None:
-        self.dataframe.to_csv('sample_csv copy.csv',index=False)        
+        self.dataframe.to_csv(self.file_name,index=False)        
         
 
     def handle_na(self, method:str):
@@ -152,10 +154,10 @@ class DataPreprocessor:
         if self.dataframe is not None:
             context['dataframe']=self.dataframe
             context['logs']=self.returnLogs
-
             return context 
         else:
-            return 'error'
+            context['error']=f'something went wrong!'
+            return context
         
 
 

@@ -8,7 +8,7 @@ from data_prep_pipeline import DataPrep as p
 from data_preprocessing_pipeline import DataPreprocessor as q 
 result_dict:dict= p('./sample_excel copy.xls').print_result()
 
-with q(result_dict.get('dataframe')) as q_ctx:
+with q(result_dict.get('dataframe'),'sample_csv copy.csv') as q_ctx:
     q_ctx.handle_na(c.MEAN)
     q_ctx.handle_na(c.MODE)
     q_ctx.handle_outliers(c.SPLINE)
