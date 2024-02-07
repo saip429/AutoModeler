@@ -6,4 +6,6 @@ __pycache__/
 *.xls
 *.pdf
 *.png
-
+.env
+*.txt
+*/migrations/

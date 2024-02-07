@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block extra_styles %}
+<style>
+
+    .dataframe-table{
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid black;
+        padding: 10px;
+        overflow: auto;
+    }
+
+    table {
+            width: 100%; /* Use full width of parent */
+            border-collapse: collapse; /* Collapse borders */
+        }
+        th, td {
+            border: 1px solid #ddd; /* Add borders to cells */
+            padding: 8px; /* Add padding for spacing */
+            text-align: left; /* Align text to the left */
+        }
+        th {
+            background-color: #f2f2f2; /* Light gray background for header */
+        }
+    .pairplot-div{
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid black;
+        padding: 10px;
+        overflow: auto;
+    }
+</style>
+
+{% endblock extra_styles %}
+{% block content %}
+
+
+<div>
+    <!-- <h1>{{ name }}</h1>  -->
+    <h1>Uploaded data</h1>
+    <div class="dataframe-table">
+        
+        <table>
+            {{ dataframe | safe }}
+        </table>
+          
+
+    </div>
+    
+
+    <!-- <h1>{{pairplot}}</h1> -->
+    <h1>Data info</h1>
+    <div class="dataframe-table">
+        
+        <table>
+            {{ info | safe }}
+        </table>
+          
+
+    </div>
+    <h1>Data summary</h1>
+    <div class="dataframe-table">
+        
+        <table>
+            {{ summary | safe }}
+        </table>
+          
+
+    </div>
+    <h1> Data outliers</h1>
+    {{outliers | safe}}
+   <h1> Missing values</h1>
+   {{missing_values}}
+
+   <h1>Pairplot</h1>
+   <div class="pairplot-div">
+    
+    <img src="{% url 'pairplot' pairplot %}" alt="Image">
+
+    
+
+   </div>
+   <a href="{% url 'pairplot' pairplot %}" download="pairplot.png">
+    <button>Download Image</button>
+
+    <a href="{% url 'preprocess' name %}">
+
+        <button>Perform data preprocessing</button>
+    </a>
+
+    <small> {{logs}}</small>
+</div>
+
+
+{% endblock content %}
