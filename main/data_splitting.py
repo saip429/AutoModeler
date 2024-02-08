@@ -1,12 +1,17 @@
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import os
-
+from django.conf import settings
+from .purge import PurgeDirectory
 
 class DataSplitter:
-    def __init__(self, file_path: str, target_column: str) -> None:
+    def __init__(self, file_path: str, target_column) -> None:
         self.file_path = file_path
         self.target_column = target_column
+        file_purger=PurgeDirectory(settings.TRAIN_FILES_UPLOAD_DIR,3)
+        file_purger=PurgeDirectory(settings.TEST_FILES_UPLOAD_DIR,3)
+
+        self.file_logs=file_purger.returnLogs()
 
     def __enter__(self):
         return self.split_data()
@@ -32,8 +37,11 @@ class DataSplitter:
 
         train_df.to_csv(train_path, index=False)
         test_df.to_csv(test_path, index=False)
-
-        return train_path, test_path
+        context={}
+        context['train_path']=train_path
+        context['test_path']=test_path
+        context['file_logs']=self.file_logs
+        return context
 
     def __exit__(self, exc_tb, exc_type, exc_value):
         pass

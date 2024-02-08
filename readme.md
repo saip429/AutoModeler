@@ -1,22 +1,45 @@
 # Auto ML   
 > Automatic tool to analyze and operate on time series data  
 
-## features  
-### coming soon ...  
+## features    
+* > Allows user to upload csv files and perform EDA operations  
+* > Allows user to perform data preprocessing operations and download cleaned data  
+* > Allows user to perform data splitting and download train and test datasets  
+#### EDA Operations  
+* Provide summary of the dataset (data elements datatype, number of entries and more)
+* Provide number of outliers based on Z-Score
+* Provide number of missing values  
 
-##  Docs  
+#### Data preprocessing operations  
+* Handle missing values by either dropping them or imputation with mean, median or mode  
+* Encode data using label encoding or one hot encoding  
+* Handle outleirs using splining or winsorizing  
+* Standardize data
+ 
+
+##  Docs    
+withing main/ you will find-
 * ### data_prep_pipeline.py:  
-Script to perform EDA on files. Accepts .csv, .xls files. returns data summary, missing values, data types and other info. Use as a context manager
+Script to perform EDA on files. Accepts .csv, .xls files. returns data summary, missing values, data types and other info.
 
 * ### data_preprocessing_pipeline.py:  
-Script to perform data preprocessing. Includes handling NaN values (imputation), handling outliers (splining, winsorizing), data encoding (label, One hot encoding), standardize data. Use as a context manager     
+Script to perform data preprocessing. Includes handling NaN values (imputation), handling outliers (splining, winsorizing), data encoding (label, One hot encoding), standardize data.   
 
 * ### data_splitting.py:  
-Script to split data into training, and testing, takes file path and target column as argument, returns file path of training and testing data . Use as a context manager
+Script to split data into training, and testing, takes file path and target column as argument, returns file path of training and testing data . 
 
-* ### utils/:  
-utility scripts directory for automatic file purge  
+* ### purge.py:  
+utility script for automatic file purge  
 * ### images/:  
-Image dump directory  
+Image dump directory    
+* ### data/:  
+files dump directory   
+
+### Run locally:  
+* download requiements after cloning repository
+> ####  pip install -m requirements.txt
+* Run django app 
+> #### python manage.py runserver
+
 
 

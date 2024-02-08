@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block extra_styles %}
+
+<style>
+    .dataframe-table{
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid black;
+        padding: 10px;
+        overflow: auto;
+    }
+
+    table {
+            width: 100%; /* Use full width of parent */
+            border-collapse: collapse; /* Collapse borders */
+        }
+        th, td {
+            border: 1px solid #ddd; /* Add borders to cells */
+            padding: 8px; /* Add padding for spacing */
+            text-align: left; /* Align text to the left */
+        }
+        th {
+            background-color: #f2f2f2; /* Light gray background for header */
+        }
+    .operation-logs{
+        border: 2px solid black;
+        width: 400px;
+        margin-top: 2rem;
+        background-color: rgb(247, 252, 153);
+    }
+
+    .operation-logs ul li{
+        list-style-type: disc;
+        margin-top: 0.5rem;
+    }
+
+    .container{
+        
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+    }
+    button{
+        padding: 10px 20px; 
+    font-size: 16px; 
+    margin-top: 1rem;
+    color: white;
+    border-radius: 8px;
+    
+    }
+
+    .red{
+        background-color: red;
+    }
+    .green{
+        background-color: green;
+    }
+</style>
+{% endblock extra_styles %}
+
+{% block content %}
+<div class="container">
+    <h1> cleaned data </h1>
+    <div class='dataframe-table' >
+    <table>
+    {{dataframe | safe}}
+</table>
+</div>
+
+
+<div class="operation-logs">
+<ul>
+<h3>operation logs</h3>
+{% for log in logs %}
+    <li>{{log}}</li>
+{% endfor %}
+</ul>
+</div>
+{% if error %}
+    <h1>{{error}}</h1>
+{% endif %}
+
+<a href="{% url 'csv' file_path %}" download="data.csv">
+    <button class="red">Download CSV</button>
+    <a href="{% url 'split' file_path %}">
+
+        <button class="green">Train-Test Split</button>
+    </a>
+</div>
+{% endblock content %}

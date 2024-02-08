@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block page_title %}
+<title>
+    Auto ML| data preprocessing
+</title>
+
+{% endblock page_title%}
+
+{% block extra_styles %}
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+  margin: 0;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+select,
+input[type="radio"] {
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  appearance: none;
+  background-color: #f9f9f9;
+}
+
+input[type="radio"] {
+  width: auto;
+  margin-right: 8px;
+  border-radius: 50%;
+  border: 2px solid black;
+}
+
+input[type="radio"]:checked {
+  background-color: #007bff;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:focus {
+  outline: none;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-title h2 {
+  color: #333;
+  margin: 0;
+  padding: 10px 0;
+  
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+</style>  
+  
+
+{% endblock extra_styles %}
+
+{% block content %}
+<div class="form-title">
+    <h2>Data Preprocessing</h2>
+  </div>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <div>
+      <label for="imputation-method">Choose Imputation Method:</label>
+      <select id="imputation-method" name="imputation-method" required>
+        <option value="mean">Mean</option>
+        <option value="median">Median</option>
+        <option value="mode">Mode</option>
+        <option value="drop-na">Drop NA</option>
+      </select>
+    </div>
+    <div>
+      <label for="encoding-method">Choose Encoding Method:</label>
+      <select id="encoding-method" name="encoding-method" required>
+        <option value="label-encoding">Label Encoding</option>
+        <option value="one-hot-encoding">One Hot Encoding</option>
+      </select>
+    </div>
+    <div>
+      <label for="outlier-method">Choose Outlier Method:</label>
+      <select id="outlier-method" name="outlier-method" required>
+        <option value="splining">Splining</option>
+        <option value="winsorize">Winsorize</option>
+      </select>
+    </div>
+    <div>
+      <label>Standardize Data:</label><br>
+      <input type="radio" id="standardize-yes" name="standardize" value="yes" checked required>
+      <label for="standardize-yes">Yes</label><br>
+      <input type="radio" id="standardize-no" name="standardize" value="no" >
+      <label for="standardize-no">No</label><br>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+
+
+{% endblock content %}

@@ -2,7 +2,7 @@
 Data preprocessing pipeline:
 involves functions to handle missing values, outliers, standardize data, label encoding, one hot encoding
 implemented as a context manager
-required args: pandas dataframe, file path
+required args:  file path
 returns: data pre processing results upon invoking the get_result method
 
 """
@@ -23,7 +23,8 @@ class DataPreprocessor:
     def __init__(self, file_name: str) -> None:
         self.file_name = file_name
         self.dataframe: pd.DataFrame = pd.read_csv(self.file_name)
-        self.returnLogs: str = None
+        self.returnLogs: list = []
+        
 
     def __enter__(self):
         return self
@@ -41,7 +42,7 @@ class DataPreprocessor:
         # drop missing values
         if method == c.DROPNA:
             self.dataframe = self.dataframe.dropna(axis=0, inplace=True)
-            self.returnLogs = "dropped all null values"
+            self.returnLogs.append("dropped all null values") 
 
         elif method == c.MEAN:
             numeric_columns = self.dataframe.select_dtypes(
@@ -50,7 +51,7 @@ class DataPreprocessor:
             self.dataframe[numeric_columns] = self.dataframe[numeric_columns].fillna(
                 self.dataframe[numeric_columns].mean()
             )
-            self.returnLogs = "imputation with mean successful"
+            self.returnLogs.append("imputation with mean successful")
 
         elif method == c.MEDIAN:
             numeric_columns = self.dataframe.select_dtypes(
@@ -59,7 +60,7 @@ class DataPreprocessor:
             self.dataframe[numeric_columns] = self.dataframe[numeric_columns].fillna(
                 self.dataframe[numeric_columns].median()
             )
-            self.returnLogs = "imputation with median successful"
+            self.returnLogs.append("imputation with median successful")
 
         elif method == c.MODE:
             all_columns = self.dataframe.select_dtypes(include=["object"]).columns
@@ -69,7 +70,7 @@ class DataPreprocessor:
 
                     self.dataframe[col] = self.dataframe[col].fillna(mode_value)
 
-            self.returnLogs = "imputation with mode successful"
+            self.returnLogs.append("imputation with mode successful")
 
         else:
             raise ValueError("invalid operation")
@@ -79,6 +80,7 @@ class DataPreprocessor:
         label_encoder = LabelEncoder()
         for column in self.dataframe.select_dtypes(include="object").columns:
             self.dataframe[column] = label_encoder.fit_transform(self.dataframe[column])
+        self.returnLogs.append('label encoding successful')
 
     # one hot encoding
     def one_hot_encoding(self):
@@ -102,6 +104,7 @@ class DataPreprocessor:
         self.dataframe = pd.concat([self.dataframe, encoded_df], axis=1)
 
         self.dataframe.drop(object_columns, axis=1, inplace=True)
+        self.returnLogs.append('one hot encoding successful')
 
     # outlier handling
     def handle_outliers(self, method: str):
@@ -119,6 +122,7 @@ class DataPreprocessor:
             self.dataframe[numeric_columns] = self.dataframe[numeric_columns].apply(
                 spline_columns
             )
+            self.returnLogs.append('splined outliers')
 
         elif method == c.WINSORIZE:
 
@@ -128,6 +132,7 @@ class DataPreprocessor:
             self.dataframe[numeric_columns] = self.dataframe[numeric_columns].apply(
                 winsorize_columns
             )
+            self.returnLogs.append('winsorized outliers')
 
         elif method == c.DROP_OUTLIERS:
 
@@ -141,6 +146,7 @@ class DataPreprocessor:
             self.dataframe[numeric_columns] = drop_outliers(
                 self.dataframe[numeric_columns]
             )
+            self.returnLogs.append('dropped outliers')
 
         else:
             raise ValueError("invalid operation")
@@ -157,6 +163,7 @@ class DataPreprocessor:
         self.dataframe[numeric_columns] = scaler.fit_transform(
             self.dataframe[numeric_columns]
         )
+        self.returnLogs.append("standardized data")
 
     def get_result(self) -> dict:
         context: dict = {}

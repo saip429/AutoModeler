@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block page_title %}
+<title>
+    Auto ML| EDA results
+</title>
+
+{% endblock page_title%}
 {% block extra_styles %}
 <style>
 
@@ -12,16 +18,16 @@
     }
 
     table {
-            width: 100%; /* Use full width of parent */
-            border-collapse: collapse; /* Collapse borders */
+            width: 100%; 
+            border-collapse: collapse; 
         }
         th, td {
-            border: 1px solid #ddd; /* Add borders to cells */
-            padding: 8px; /* Add padding for spacing */
-            text-align: left; /* Align text to the left */
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left; 
         }
         th {
-            background-color: #f2f2f2; /* Light gray background for header */
+            background-color: #f2f2f2; 
         }
     .pairplot-div{
         max-height: 400px;
@@ -29,6 +35,30 @@
         border: 1px solid black;
         padding: 10px;
         overflow: auto;
+    }
+    .btn{
+        
+        margin: 2rem auto;
+    }
+
+    .btn a {
+    text-decoration: none; 
+}
+
+
+.btn a button {
+    
+    
+    padding: 10px 20px; 
+    font-size: 16px; 
+    color: white;
+    border-radius: 8px;
+}
+.red{
+    background-color: red;
+}
+    .green{
+        background-color: green;
     }
 </style>
 
@@ -81,15 +111,19 @@
     
 
    </div>
+  
+   <div class ='btn'>
+   
    <a href="{% url 'pairplot' pairplot %}" download="pairplot.png">
-    <button>Download Image</button>
-
+    <button class="red">Download Image</button>
+    
     <a href="{% url 'preprocess' name %}">
 
-        <button>Perform data preprocessing</button>
+        <button class="green">Perform data preprocessing</button>
     </a>
+</div>
 
-    <small> {{logs}}</small>
+    
 </div>
 
 

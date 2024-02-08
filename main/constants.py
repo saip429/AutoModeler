@@ -2,12 +2,12 @@
 Constants for the project 
 """
 
-DROPNA = "drop NaN"
+DROPNA = "drop-na"
 MEAN = "mean"
 MEDIAN = "median"
 MODE = "mode"
 
-SPLINE = "Univariate Splining"
+SPLINE = "splining"
 
 WINSORIZE = "winsorize"
 

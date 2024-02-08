@@ -138,6 +138,6 @@ FILES_UPLOAD_DIR= os.path.join(BASE_DIR,'data/files')
 
 IMAGES_UPLOAD_DIR=os.path.join(BASE_DIR,'images')
 
-TRAIN_CSV_DIR=os.path.join(BASE_DIR,'data/train_files')
+TRAIN_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/train_files')
 
-TEST_CSV_DIR=os.path.join(BASE_DIR,'data/test_files')
+TEST_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/test_files')
