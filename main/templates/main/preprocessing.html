@@ -131,11 +131,14 @@ button:focus {
       </select>
     </div>
     <div>
-      <label>Standardize Data:</label><br>
-      <input type="radio" id="standardize-yes" name="standardize" value="yes" checked required>
-      <label for="standardize-yes">Yes</label><br>
-      <input type="radio" id="standardize-no" name="standardize" value="no" >
-      <label for="standardize-no">No</label><br>
+      <label for="scaling-method">Choose Scaling Method:</label>
+      <select id="scaling-method" name="scaling-method" required>
+        <option value="standard">Standard Scaling</option>
+        <option value="minmax">MinMax Scaling</option>
+        <option value="robust">Robust Scaling</option>
+
+      </select>
+     
     </div>
     <button type="submit">Submit</button>
   </form>

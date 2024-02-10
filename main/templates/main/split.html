@@ -78,6 +78,30 @@
     <a href="{% url 'csv' test_path %}" download="test_data.csv">
         <button class="green">Download Test CSV</button>
     </a>
+    <h1>Wish to train a model?</h1>
+    <form action="{% url 'train-model'  %}" method="post">
+    
+        {% csrf_token %}
+        <div >
+            <label for="target">Enter target column</label>
+            <input type="text" name="target" id="target" required>
+            <label for="model-type">Choose Model:</label>
+            <select id="model-type" name="model-type" required>
+              <option value="linear regression">Linear Regression</option>
+              <option value="lstm">LSTM</option>
+                   
+            </select>
+            
+        </div>
+        
+        <button type="submit" class="submit-btn">Submit</button>
+        <input type="hidden" name="file_path" value="{{ file_path }}">
+        
+        <input type="hidden" name="train_path" value="{{ train_path }}">
+        <input type="hidden" name="test_path" value="{{ test_path }}">
+    </form>
+    <div>
+
 
     
 {% endif %}

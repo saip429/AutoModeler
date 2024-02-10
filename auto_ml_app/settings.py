@@ -141,3 +141,5 @@ IMAGES_UPLOAD_DIR=os.path.join(BASE_DIR,'images')
 TRAIN_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/train_files')
 
 TEST_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/test_files')
+
+JOBLIB_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/modelsDump')

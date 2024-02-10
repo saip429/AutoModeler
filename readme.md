@@ -14,7 +14,11 @@
 * Handle missing values by either dropping them or imputation with mean, median or mode  
 * Encode data using label encoding or one hot encoding  
 * Handle outleirs using splining or winsorizing  
-* Standardize data
+* Standardize data  
+
+#### Model training (in progress)
+* Linear Regression  
+* LSTM
  
 
 ##  Docs    

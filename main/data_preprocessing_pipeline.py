@@ -9,7 +9,7 @@ returns: data pre processing results upon invoking the get_result method
 
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler, MinMaxScaler, RobustScaler
 from scipy.stats import zscore
 from scipy.interpolate import UnivariateSpline
 from scipy.stats.mstats import winsorize
@@ -152,18 +152,38 @@ class DataPreprocessor:
             raise ValueError("invalid operation")
 
     # standardize data (only after encoding)
-    def standardize_data(self):
-        self.dataframe.columns = self.dataframe.columns.astype(str)
+    # def standardize_data(self):
+    #     self.dataframe.columns = self.dataframe.columns.astype(str)
 
-        # Standardize numeric
-        numeric_columns = self.dataframe.select_dtypes(
-            include=["float64", "int64"]
-        ).columns
-        scaler = StandardScaler()
-        self.dataframe[numeric_columns] = scaler.fit_transform(
-            self.dataframe[numeric_columns]
-        )
-        self.returnLogs.append("standardized data")
+    #     # Standardize numeric
+    #     numeric_columns = self.dataframe.select_dtypes(
+    #         include=["float64", "int64"]
+    #     ).columns
+    #     scaler = StandardScaler()
+    #     self.dataframe[numeric_columns] = scaler.fit_transform(
+    #         self.dataframe[numeric_columns]
+    #     )
+    #     self.returnLogs.append("standardized data")
+
+    # scale data 
+    def scale_data(self, method:str):
+        # standard scaling
+        if method==c.STANDARD_SCALING:
+            scaler=StandardScaler()
+        elif method==c.MINMAX_SCALING:
+            scaler=MinMaxScaler()
+        elif method==c.ROBUST_SCALING:
+            scaler=RobustScaler()
+        else: 
+            raise ValueError("invaid scaler type")
+        
+        scaled_data=scaler.fit_transform(self.dataframe)
+
+        scaled_dataframe=pd.DataFrame(scaled_data,columns=self.dataframe.columns)
+
+        self.dataframe=scaled_dataframe
+
+        self.returnLogs.append(f'{method} scaling applied')
 
     def get_result(self) -> dict:
         context: dict = {}
