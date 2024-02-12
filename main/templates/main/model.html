@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% block page_title %}
+<title> AutoML | Results </title>
+
+{% endblock page_title %}
 
 {% block extra_styles %}
 
@@ -78,7 +82,9 @@
 
 
 </div>
+{% if plot_name %}
 <img src="{% url 'pairplot' plot_name %}" alt="scatter plot" srcset=""> 
+{% endif %}
 <a href="{% url 'home' %}">
     <button class="blue">Home</button>
 </a>

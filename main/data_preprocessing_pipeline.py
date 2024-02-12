@@ -166,7 +166,7 @@ class DataPreprocessor:
     #     self.returnLogs.append("standardized data")
 
     # scale data 
-    def scale_data(self, method:str):
+    def scale_data(self, method:str, target_column:str):
         # standard scaling
         if method==c.STANDARD_SCALING:
             scaler=StandardScaler()
@@ -176,12 +176,14 @@ class DataPreprocessor:
             scaler=RobustScaler()
         else: 
             raise ValueError("invaid scaler type")
-        
-        scaled_data=scaler.fit_transform(self.dataframe)
+        df=self.dataframe.drop(columns=[target_column])
+        feature_columns=df.columns
 
-        scaled_dataframe=pd.DataFrame(scaled_data,columns=self.dataframe.columns)
+        scaled_data=scaler.fit_transform(self.dataframe[feature_columns])
 
-        self.dataframe=scaled_dataframe
+        scaled_dataframe=pd.DataFrame(scaled_data,columns=self.dataframe[feature_columns].columns)
+
+        self.dataframe[feature_columns]=scaled_dataframe
 
         self.returnLogs.append(f'{method} scaling applied')
 

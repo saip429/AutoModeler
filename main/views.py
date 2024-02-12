@@ -4,12 +4,16 @@ from django.http import HttpResponse
 from .forms import FileModelForm
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor, plot_tree
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from .data_prep_pipeline import DataPrep 
 from .data_preprocessing_pipeline import DataPreprocessor
 from .data_splitting import DataSplitter
 from .purge import PurgeDirectory
-import matplotlib.pyplot as plt 
+from keras.models import Sequential
+from keras.layers import LSTM, Dense
+import matplotlib.pyplot as plt  
+import numpy as np    
 import seaborn as sns
 import io
 import os
@@ -103,6 +107,7 @@ def analyze(request, file_path:str):
         encoding_method=request.POST.get('encoding-method')
         outlier_method=request.POST.get('outlier-method')
         scaling_method=request.POST.get('scaling-method')
+        target_column=request.POST.get('target column')
        
         my_pipeline.handle_na(imputation_method)
         my_pipeline.handle_na('mode')
@@ -111,8 +116,8 @@ def analyze(request, file_path:str):
         elif encoding_method=='one-hot-encoding':
             my_pipeline.one_hot_encoding()
         my_pipeline.handle_outliers(outlier_method)
-        if scaling_method is not None:
-            my_pipeline.scale_data(scaling_method)
+        if scaling_method != 'none':
+            my_pipeline.scale_data(scaling_method,target_column)
         my_pipeline.save()
         result_dict=my_pipeline.get_result()
         
@@ -155,6 +160,7 @@ def train_test_split(request, file_path):
 def train_model(request):
     try:
         filename=request.POST.get('file_path')
+        data=pd.read_csv(filename)
         filename=os.path.basename(filename)
         filename=filename.split('.')[0]
         train_path=request.POST.get('train_path')
@@ -170,20 +176,22 @@ def train_model(request):
         
         saved_file=''
         eval_metrics:dict={}
+        eval_metrics['model']=model_type
         if model_type=='linear regression':
             model=LinearRegression()
             model.fit(X_train,y_train)
 
             y_pred=model.predict(X_test)
-
-            mae=mean_absolute_error(y_test,y_pred)
-            mse=mean_squared_error(y_test,y_pred)
-            rmse=mean_squared_error(y_test, y_pred, squared=False)
-            r2=r2_score(y_test,y_pred)
             
-            eval_metrics['Mean Square Error']=mse
+            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)
+            # mse=round(mean_squared_error(y_true=y_test,y_pred=y_pred),2)
+            # rmse=round(mean_squared_error(y_true=y_test,y_pred=y_pred,squared=False),2)
+        
+            r2=round(r2_score(y_test,y_pred),2)
+            
+            #eval_metrics['Mean Square Error']=mse
             eval_metrics['Mean Absolute Error']=mae
-            eval_metrics['Root Mean Square Error']=rmse
+            #eval_metrics['Root Mean Square Error']=rmse
             eval_metrics['R2 Score']=r2
             saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'.joblib'
             joblib.dump(model, saved_file)
@@ -191,25 +199,37 @@ def train_model(request):
          
             y_true=y_test
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-    
-            # Scatter plot of predicted vs. true values
-            ax1.scatter(y_true, y_pred, color='blue', label='predicted vs actual')
-            ax1.plot([min(y_true), max(y_true)], [min(y_true), max(y_true)], color='red', linestyle='--', label='perfect prediction')
-            ax1.set_xlabel('True Values', fontsize=14)
-            ax1.set_ylabel('Predicted Values', fontsize=14)
-            ax1.set_title('Scatter Plot: Actual vs. Predicted Values', fontsize=16)
-            ax1.tick_params(axis='both', labelsize=12)
-            ax1.grid(True)
-            ax1.legend(fontsize=12)
-    
-            # Box plot of predicted and true values
-            sns.boxplot(data=[y_true, y_pred], ax=ax2, palette=['blue', 'red'])
-            ax2.set_xlabel('Values', fontsize=14)
-            ax2.set_ylabel('Distribution', fontsize=14)
-            ax2.set_title('Box Plot: Actual vs. Predicted Values', fontsize=16)
-            ax2.tick_params(axis='both', labelsize=12)
-            ax2.grid(True)
-            ax2.legend(['True Values', 'Predicted Values'], fontsize=12)
+           
+            
+            
+            residuals = y_test - y_pred
+
+           # Create a residual plot
+            
+            ax1.scatter(y_pred, residuals, color='blue', alpha=0.5)
+            ax1.axhline(y=0, color='red', linestyle='--')
+            ax1.set_xlabel('Predicted Values')
+            ax1.set_ylabel('Residuals')
+            ax1.set_title('Residual Plot')
+            
+
+            coefficients = model.coef_
+
+            feature_names = data.columns              
+
+            # Sort coefficients in descending order
+            sorted_indices = coefficients.argsort()[::-1]
+            sorted_coefficients = coefficients[sorted_indices]
+            sorted_feature_names = feature_names[sorted_indices]
+
+            # Create a bar plot of feature coefficients
+            
+            ax2.bar(sorted_feature_names, sorted_coefficients, color='blue')
+            ax2.set_xlabel('Features')
+            ax2.set_ylabel('Importance')
+            ax2.set_title('Feature Importance Plot')
+            ax2.set_xticklabels(sorted_feature_names,rotation=90)
+            plt.show()
     
             plt.tight_layout()
             
@@ -217,6 +237,19 @@ def train_model(request):
             plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_scatterplot"+'.png'
             plt.savefig(plot_name)
             PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+        elif model_type=='lstm':
+            
+            pass
+            
+        elif model_type=='decision tree':
+            model=DecisionTreeRegressor()
+            model.fit(X_train,y_train)
+            y_pred=model.predict(X_test)
+            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)
+            eval_metrics['Mean Absolute Error']=mae
+            plot_name=None
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'.joblib'
+            joblib.dump(model, saved_file)
         else:
             pass
         return render(request,'main/model.html',{'eval_metrics':eval_metrics,
@@ -225,15 +258,10 @@ def train_model(request):
 
 
 
-
-
-
-
-
     except Exception as e:
         return render(request,'main/error.html',{'error':e})
 
-
+# download trained model as joblib file
 def download_joblib(request, file_path):
     with open(file_path,'rb') as f:
         file_data=f.read()

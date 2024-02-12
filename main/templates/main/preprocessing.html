@@ -55,7 +55,12 @@ input[type="radio"] {
   border-radius: 50%;
   border: 2px solid black;
 }
-
+input[type="text"] {
+  width: auto;
+  padding: 0.1rem;
+  margin-right: 8px;
+  margin-bottom: 0.2rem;
+}
 input[type="radio"]:checked {
   background-color: #007bff;
 }
@@ -133,12 +138,17 @@ button:focus {
     <div>
       <label for="scaling-method">Choose Scaling Method:</label>
       <select id="scaling-method" name="scaling-method" required>
+        <option value="none">None</option>
         <option value="standard">Standard Scaling</option>
         <option value="minmax">MinMax Scaling</option>
         <option value="robust">Robust Scaling</option>
 
       </select>
      
+    </div>
+    <div>
+      <label for="target-column">Enter target column</label>
+      <input type="text" name="target column" id="target-column">
     </div>
     <button type="submit">Submit</button>
   </form>

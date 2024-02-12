@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
+{% block page_title %}
+<title>Auto ML| Data splitting</title>
 
+{% endblock page_title %}
 {% block extra_styles %}
 
 <style>
@@ -88,6 +91,7 @@
             <label for="model-type">Choose Model:</label>
             <select id="model-type" name="model-type" required>
               <option value="linear regression">Linear Regression</option>
+              <option value="decision tree">decision tree</option>
               <option value="lstm">LSTM</option>
                    
             </select>
