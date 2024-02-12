@@ -1,5 +1,5 @@
-# Auto ML   
-> Automatic tool to analyze and operate on time series data  
+# Auto Modeler
+> Automatic tool to analyze, operate on, and train models on time series data  
 
 ## features    
 * > Allows user to upload csv files and perform EDA operations  
