@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from .forms import FileModelForm
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from sklearn.tree import DecisionTreeRegressor, plot_tree
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, accuracy_score
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
 from .data_prep_pipeline import DataPrep 
 from .data_preprocessing_pipeline import DataPreprocessor
 from .data_splitting import DataSplitter
