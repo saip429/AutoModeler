@@ -1,3 +1,11 @@
+'''
+views summary:
+home(): render home page, accept file upload and save file to backend, call EDA pipeline and render results, serve pairplot
+analyze(): perform data preprocessing, accept user parameters and render results, server cleaned data
+train_test_split(): perform data splitting, serve split data
+train_model(): train model as per user requirements, render train results, evaluation metrics and serve model as joblib file
+'''
+
 from django.shortcuts import render,redirect
 from django.conf import settings
 from django.http import HttpResponse
@@ -11,8 +19,6 @@ from .data_prep_pipeline import DataPrep
 from .data_preprocessing_pipeline import DataPreprocessor
 from .data_splitting import DataSplitter
 from .purge import PurgeDirectory
-# from keras.models import Sequential
-# from keras.layers import LSTM, Dense
 import matplotlib.pyplot as plt  
 import xgboost as xgb
 
@@ -21,7 +27,7 @@ import seaborn as sns
 import io
 import os
 import joblib
-# Create your views here.
+
 
 def home(request):
     # take file from user 
@@ -65,7 +71,7 @@ def home(request):
                     with open('file_delete_logs.txt', 'a') as f:
                         for item in file_logs:
                          f.write("%s\n" % item)
-                    with open('image_delte_logs.txt','a') as f:
+                    with open('image_delete_logs.txt','a') as f:
                         for item in image_logs:
                             f.write("%s\n" % item)
                 except Exception as e:
@@ -84,11 +90,6 @@ def home(request):
                 return render(request,'main/error.html',{'error':form})
     except Exception as e:
         return render(request,'main/error.html',{'error':e})
-
-       
-
-    
-
             
     else:
         form=FileModelForm()
@@ -96,14 +97,9 @@ def home(request):
         return render( request,'main/home.html',{'form':form})
     
 
-def get_pairplot(request, image_path):
-    with open(image_path,'rb') as f:
-        iamge_data=f.read()
-    return HttpResponse(iamge_data, content_type='image/png')
 
-def analyze(request, file_path:str):
-    
-   
+
+def analyze(request, file_path:str):      
     if request.method=='POST':
         my_pipeline=DataPreprocessor(file_path)
         imputation_method=request.POST.get('imputation-method')
@@ -135,10 +131,7 @@ def analyze(request, file_path:str):
 
     return render(request,'main/preprocessing.html',{'file_path':file_path})
 
-def get_csv(request, file_path):
-    with open(file_path,'rb') as f:
-        file_data=f.read()
-    return HttpResponse(file_data, content_type='file/csv')
+
 
 def train_test_split(request, file_path):
      
@@ -183,43 +176,24 @@ def train_model(request):
         if model_type=='linear regression':
             model=LinearRegression()
             model.fit(X_train,y_train)
-
-            y_pred=model.predict(X_test)
-            
-            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)
-            # mse=round(mean_squared_error(y_true=y_test,y_pred=y_pred),2)
-            # rmse=round(mean_squared_error(y_true=y_test,y_pred=y_pred,squared=False),2)
-        
-            r2=round(r2_score(y_test,y_pred),2)
-            
-            #eval_metrics['Mean Square Error']=mse
-            eval_metrics['Mean Absolute Error']=mae
-
-            #eval_metrics['Root Mean Square Error']=rmse
+            y_pred=model.predict(X_test)            
+            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)        
+            r2=round(r2_score(y_test,y_pred),2)        
+            eval_metrics['Mean Absolute Error']=mae            
             eval_metrics['R2 Score']=r2
             saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_linear_'+'.joblib'
-            joblib.dump(model, saved_file)
-         
-         
+            joblib.dump(model, saved_file)       
             y_true=y_test
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-           
-            
-            
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))         
             residuals = y_test - y_pred
-
-           # Create a residual plot
-            
+           # Create a residual plot            
             ax1.scatter(y_pred, residuals, color='blue', alpha=0.5)
             ax1.axhline(y=0, color='red', linestyle='--')
             ax1.set_xlabel('Predicted Values')
             ax1.set_ylabel('Residuals')
-            ax1.set_title('Residual Plot')
-            
-
+            ax1.set_title('Residual Plot')        
             coefficients = model.coef_
-
-            feature_names = data.columns              
+            feature_names = data.columns             
 
             # Sort coefficients in descending order
             sorted_indices = coefficients.argsort()[::-1]
@@ -233,14 +207,16 @@ def train_model(request):
             ax2.set_ylabel('Importance')
             ax2.set_title('Feature Importance Plot')
             ax2.set_xticklabels(sorted_feature_names,rotation=90)
-            plt.show()
-    
+            plt.show()    
             plt.tight_layout()
-            
-            
             plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
             plt.savefig(plot_name)
-            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            purger=PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            file_logs=purger.logs
+            with open('image_delete_logs.txt', 'a') as f:
+                        for item in file_logs:
+                         f.write("%s\n" % item)
+
         # Logistic regression
         elif model_type=='logistic regression':
             target_column_type=data[target_column].dtype
@@ -248,40 +224,24 @@ def train_model(request):
                 raise Exception('The target variable is likeley continious, can not use logistic regression')
             model=LogisticRegression()
             model.fit(X_train,y_train)
-            y_pred=model.predict(X_test)
-
-            
-            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)
-           
-        
+            y_pred=model.predict(X_test)            
+            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)          
             r2=round(r2_score(y_test,y_pred),2)
-            
-            
             eval_metrics['Mean Absolute Error']=mae
-
-            
             eval_metrics['R2 Score']=r2
             saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_logistic_'+'.joblib'
             joblib.dump(model, saved_file)
-
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-           
-            
-            
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))         
             residuals = y_test - y_pred
 
-           # Create a residual plot
-            
+           # Create a residual plot            
             ax1.scatter(y_pred, residuals, color='blue', alpha=0.5)
             ax1.axhline(y=0, color='red', linestyle='--')
             ax1.set_xlabel('Predicted Values')
             ax1.set_ylabel('Residuals')
             ax1.set_title('Residual Plot')
-            
-
             coefficients = model.coef_
-
-            feature_names = data.columns              
+            feature_names = data.columns             
 
             # Sort coefficients in descending order
             sorted_indices = coefficients.argsort()[::-1]
@@ -302,8 +262,13 @@ def train_model(request):
             
             plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
             plt.savefig(plot_name)
-            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            purger=PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            file_logs=purger.logs
+            with open('image_delete_logs.txt', 'a') as f:
+                        for item in file_logs:
+                         f.write("%s\n" % item)
         
+        # Decision Tree regressor
         elif model_type=='decision tree':
             model=DecisionTreeRegressor()
             model.fit(X_train,y_train)
@@ -316,17 +281,17 @@ def train_model(request):
             saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_decisionTree_'+'.joblib'
             joblib.dump(model, saved_file)
         
+        # XGBoost regression
         elif model_type=='XGBoost':
             model = xgb.XGBRegressor(objective ='reg:squarederror', colsample_bytree = 0.3, learning_rate = 0.1,
                 max_depth = 5, alpha = 10, n_estimators = 10)
             model.fit(X_train,y_train)
             y_pred=model.predict(X_test)
-
             mae=round(mean_absolute_error(y_test,y_pred),2)
             r2=round(r2_score(y_test,y_pred),2)
             eval_metrics['Mean Absolute Error']=mae
             eval_metrics['R2 score']=r2
-            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_decisionTree_'+'.joblib'
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_XGBoost_'+'.joblib'
             joblib.dump(model, saved_file)
             plt.subplots( figsize=(12, 6))
             residuals = y_test - y_pred
@@ -346,7 +311,11 @@ def train_model(request):
             
             plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
             plt.savefig(plot_name)
-            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            purger=PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            file_logs=purger.logs
+            with open('image_delete_logs.txt', 'a') as f:
+                        for item in file_logs:
+                         f.write("%s\n" % item)
 
         elif model_type=='SVM':
             model = SVR(kernel='rbf', C=1.0, epsilon=0.1)
@@ -374,23 +343,45 @@ def train_model(request):
             
             plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
             plt.savefig(plot_name)
-            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            purger=PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+            file_logs=purger.logs
+            with open('image_delete_logs.txt', 'a') as f:
+                        for item in file_logs:
+                         f.write("%s\n" % item)
 
         else:
             raise ValueError(f'{model_type} is not a valid model')
+        
+        purger=PurgeDirectory(os.path.join(settings.BASE_DIR,'data\\modelsDump\\'),3)
+        file_logs=purger.logs
+        with open('file_delete_logs.txt', 'a') as f:
+                        for item in file_logs:
+                         f.write("%s\n" % item)
         return render(request,'main/model.html',{'eval_metrics':eval_metrics,
                                          'file_path':saved_file,
                                          'plot_name':plot_name})
 
 
+        
 
     except Exception as e:
         return render(request,'main/error.html',{'error':e})
     
+# UTILITY FUNCTIONS 
 
+# serve pairplot
+def get_pairplot(request, image_path):
+    with open(image_path,'rb') as f:
+        iamge_data=f.read()
+    return HttpResponse(iamge_data, content_type='image/png')
 
+# serve csv file
+def get_csv(request, file_path):
+    with open(file_path,'rb') as f:
+        file_data=f.read()
+    return HttpResponse(file_data, content_type='file/csv')
 
-# download trained model as joblib file
+# serve trained model as joblib file
 def download_joblib(request, file_path):
     with open(file_path,'rb') as f:
         file_data=f.read()
