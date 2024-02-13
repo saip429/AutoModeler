@@ -16,9 +16,15 @@
 * Handle outleirs using splining or winsorizing  
 * Standardize data  
 
-#### Model training (in progress)
+#### Model training  
+Allows the user to train models on the cleaned data   
+
+Available models:
 * Linear Regression  
-* LSTM
+* XG Boost
+* Support Vector Machine  
+* Decision Tree Regressor  
+* Logistic Regression
  
 
 ##  Docs    
@@ -30,7 +36,10 @@ Script to perform EDA on files. Accepts .csv, .xls files. returns data summary, 
 Script to perform data preprocessing. Includes handling NaN values (imputation), handling outliers (splining, winsorizing), data encoding (label, One hot encoding), standardize data.   
 
 * ### data_splitting.py:  
-Script to split data into training, and testing, takes file path and target column as argument, returns file path of training and testing data . 
+Script to split data into training, and testing, takes file path and target column as argument, returns file path of training and testing data .   
+
+* ### views.py:  
+Django views that include functions to train models
 
 * ### purge.py:  
 utility script for automatic file purge  
