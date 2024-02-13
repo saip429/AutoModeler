@@ -14,7 +14,7 @@
 * Handle missing values by either dropping them or imputation with mean, median or mode  
 * Encode data using label encoding or one hot encoding  
 * Handle outleirs using splining or winsorizing  
-* Standardize data  
+* scale data with standard, MinMax and robust scaling
 
 #### Model training  
 Allows the user to train models on the cleaned data   
@@ -49,7 +49,7 @@ Image dump directory
 files dump directory   
 
 ### Run locally:  
-* download requiements after cloning repository
+* download requirements after cloning repository
 > ####  pip install -m requirements.txt
 * Run django app 
 > #### python manage.py runserver
