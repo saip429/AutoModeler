@@ -3,8 +3,9 @@ from django.conf import settings
 from django.http import HttpResponse
 from .forms import FileModelForm
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
 from sklearn.metrics import mean_absolute_error, r2_score
 from .data_prep_pipeline import DataPrep 
 from .data_preprocessing_pipeline import DataPreprocessor
@@ -13,6 +14,8 @@ from .purge import PurgeDirectory
 # from keras.models import Sequential
 # from keras.layers import LSTM, Dense
 import matplotlib.pyplot as plt  
+import xgboost as xgb
+
 import numpy as np    
 import seaborn as sns
 import io
@@ -194,7 +197,7 @@ def train_model(request):
 
             #eval_metrics['Root Mean Square Error']=rmse
             eval_metrics['R2 Score']=r2
-            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'.joblib'
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_linear_'+'.joblib'
             joblib.dump(model, saved_file)
          
          
@@ -235,25 +238,146 @@ def train_model(request):
             plt.tight_layout()
             
             
-            plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_scatterplot"+'.png'
+            plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
             plt.savefig(plot_name)
             PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
-        elif model_type=='lstm':
+        # Logistic regression
+        elif model_type=='logistic regression':
+            target_column_type=data[target_column].dtype
+            if target_column_type in [float,int]:
+                raise Exception('The target variable is likeley continious, can not use logistic regression')
+            model=LogisticRegression()
+            model.fit(X_train,y_train)
+            y_pred=model.predict(X_test)
+
             
-            pass
+            mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)
+           
+        
+            r2=round(r2_score(y_test,y_pred),2)
             
+            
+            eval_metrics['Mean Absolute Error']=mae
+
+            
+            eval_metrics['R2 Score']=r2
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_logistic_'+'.joblib'
+            joblib.dump(model, saved_file)
+
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+           
+            
+            
+            residuals = y_test - y_pred
+
+           # Create a residual plot
+            
+            ax1.scatter(y_pred, residuals, color='blue', alpha=0.5)
+            ax1.axhline(y=0, color='red', linestyle='--')
+            ax1.set_xlabel('Predicted Values')
+            ax1.set_ylabel('Residuals')
+            ax1.set_title('Residual Plot')
+            
+
+            coefficients = model.coef_
+
+            feature_names = data.columns              
+
+            # Sort coefficients in descending order
+            sorted_indices = coefficients.argsort()[::-1]
+            sorted_coefficients = coefficients[sorted_indices]
+            sorted_feature_names = feature_names[sorted_indices]
+
+            # Create a bar plot of feature coefficients
+            
+            ax2.bar(sorted_feature_names, sorted_coefficients, color='blue')
+            ax2.set_xlabel('Features')
+            ax2.set_ylabel('Importance')
+            ax2.set_title('Feature Importance Plot')
+            ax2.set_xticklabels(sorted_feature_names,rotation=90)
+            plt.show()
+    
+            plt.tight_layout()
+            
+            
+            plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
+            plt.savefig(plot_name)
+            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+        
         elif model_type=='decision tree':
             model=DecisionTreeRegressor()
             model.fit(X_train,y_train)
             y_pred=model.predict(X_test)
             mae=round(mean_absolute_error(y_true=y_test,y_pred=y_pred),2)
-           
+            r2=round(r2_score(y_test,y_pred),2)
             eval_metrics['Mean Absolute Error']=mae
+            eval_metrics['R2 score']=r2
             plot_name=None
-            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'.joblib'
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_decisionTree_'+'.joblib'
             joblib.dump(model, saved_file)
+        
+        elif model_type=='XGBoost':
+            model = xgb.XGBRegressor(objective ='reg:squarederror', colsample_bytree = 0.3, learning_rate = 0.1,
+                max_depth = 5, alpha = 10, n_estimators = 10)
+            model.fit(X_train,y_train)
+            y_pred=model.predict(X_test)
+
+            mae=round(mean_absolute_error(y_test,y_pred),2)
+            r2=round(r2_score(y_test,y_pred),2)
+            eval_metrics['Mean Absolute Error']=mae
+            eval_metrics['R2 score']=r2
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_decisionTree_'+'.joblib'
+            joblib.dump(model, saved_file)
+            plt.subplots( figsize=(12, 6))
+            residuals = y_test - y_pred
+           # Create a residual plot            
+            plt.scatter(y_pred, residuals, color='blue', alpha=0.5)
+            plt.axhline(y=0, color='red', linestyle='--')
+            plt.xlabel('Predicted Values')
+            plt.ylabel('Residuals')
+            plt.title('Residual Plot')
+            
+
+            
+            plt.show()
+    
+            plt.tight_layout()
+            
+            
+            plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
+            plt.savefig(plot_name)
+            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+
+        elif model_type=='SVM':
+            model = SVR(kernel='rbf', C=1.0, epsilon=0.1)
+            model.fit(X_train,y_train)
+            y_pred=model.predict(X_test)
+
+            mae=round(mean_absolute_error(y_test,y_pred),2)
+            r2=round(r2_score(y_test,y_pred),2)
+            
+            
+            eval_metrics['Mean Absolute Error']=mae
+
+            
+            eval_metrics['R2 Score']=r2
+            residuals = y_test - y_pred
+            plt.scatter(y_pred, residuals)
+            plt.xlabel("Predicted Values")
+            plt.ylabel("Residuals")
+            plt.title("Residual Plot")
+            plt.axhline(y=0, color='k', linestyle='--')
+            plt.show()
+            plt.tight_layout()
+            saved_file=os.path.join(settings.BASE_DIR,'data\\modelsDump\\') +filename+'_SVM_'+'.joblib'
+            joblib.dump(model, saved_file)
+            
+            plot_name=os.path.join(settings.BASE_DIR,'images\\')+filename+"_plot"+'.png'
+            plt.savefig(plot_name)
+            PurgeDirectory(os.path.join(settings.BASE_DIR,'images'),3)
+
         else:
-            pass
+            raise ValueError(f'{model_type} is not a valid model')
         return render(request,'main/model.html',{'eval_metrics':eval_metrics,
                                          'file_path':saved_file,
                                          'plot_name':plot_name})
@@ -262,6 +386,9 @@ def train_model(request):
 
     except Exception as e:
         return render(request,'main/error.html',{'error':e})
+    
+
+
 
 # download trained model as joblib file
 def download_joblib(request, file_path):

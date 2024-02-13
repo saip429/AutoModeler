@@ -62,18 +62,6 @@
       }
       
 
-      #loading-screen {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.7);
-        z-index: 9999;
-        text-align: center;
-        padding-top: 20%;
-    }
       
 </style>
 
@@ -83,14 +71,14 @@
 
 <div>
     <div class='container'> 
-        <h1> Auto ML </h1> 
-        <h3> Automatic tabluar data analysis tool</h3>
-        <div id="loading-screen">Loading...</div>
+        <h1> AutoModeler </h1> 
+        <h3> Automatic tabluar data analysis and model training tool</h3>
+        
     <form method='post' enctype='multipart/form-data'>
         
         {% csrf_token %} 
         {{form.as_p}}
-        <button type="submit" id='upload-button'>Upload</button>
+        <button type="submit" id='upload-button' >Perform EDA</button>
         
         
         
