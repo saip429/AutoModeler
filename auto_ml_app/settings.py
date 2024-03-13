@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
-from celery.schedules import crontab
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'main'
+    "main",
 ]
 
 MIDDLEWARE = [
@@ -59,7 +59,7 @@ ROOT_URLCONF = "auto_ml_app.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'static/templates'],
+        "DIRS": [BASE_DIR / "static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -105,9 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -126,7 +123,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, "static"),
 ]
 
 # Default primary key field type
@@ -134,12 +131,12 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-FILES_UPLOAD_DIR= os.path.join(BASE_DIR,'data/files')
+FILES_UPLOAD_DIR = os.path.join(BASE_DIR, "data/files")
 
-IMAGES_UPLOAD_DIR=os.path.join(BASE_DIR,'images')
+IMAGES_UPLOAD_DIR = os.path.join(BASE_DIR, "images")
 
-TRAIN_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/train_files')
+TRAIN_FILES_UPLOAD_DIR = os.path.join(BASE_DIR, "data/train_files")
 
-TEST_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/test_files')
+TEST_FILES_UPLOAD_DIR = os.path.join(BASE_DIR, "data/test_files")
 
-JOBLIB_FILES_UPLOAD_DIR=os.path.join(BASE_DIR,'data/modelsDump')
+JOBLIB_FILES_UPLOAD_DIR = os.path.join(BASE_DIR, "data/modelsDump")

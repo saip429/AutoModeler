@@ -18,7 +18,6 @@ recommend)na_ops(): recommends ways to handle NaN values
 """
 
 import pandas as pd
-import pdfplumber
 import matplotlib.pyplot as plt
 import seaborn as sns
 import random
